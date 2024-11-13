@@ -1,4 +1,3 @@
-
 import json
 import requests
 
@@ -20,9 +19,9 @@ def autotize():
     print(status_code)
     print(request_for_login.json())
 
-    #respoud_for_login = request_for_login.json()
-    #data_respoude_auto = json.loads(respoud_for_login)
-    #access_token = data_respoude_auto['data']['session']['accessToken']
-    #print(access_token)
+    access_token = request_for_login.json()['data']['session']['accessToken']
+    refresh_token = request_for_login.json()['data']['session']['refreshToken']
+    print(access_token)
+
 
 autotize()
