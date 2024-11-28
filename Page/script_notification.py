@@ -45,9 +45,8 @@ class ScadaWatchdogNotification:
         return request_for_get_notifications.json()['data']['notifications']
 
     def check_status_notification(self, list_notifications_only_new, status):
-        list_opt = list_notifications_only_new
         count = 0
-        for notification in list_opt:
+        for notification in list_notifications_only_new:
             if notification['severity'] == status: count += 1
         print(count)
 
