@@ -1,19 +1,21 @@
-from .Page.script_notification import *
+from .Page.script_notification import ScadaWatchdogNotification
 import requests
 
-access_token, refresh_token = autorize() # получили токены
+page = ScadaWatchdogNotification()
 
-run_script_notifications(access_token) # выполнили скрипт с генерацией уведомления
-list_notifications_only_new = get_notifications_only_new(access_token) # запрос всех новых уведомлений
-have_notification_warning = check_status_notification(list_notifications_only_new, "WARNING") # наличие предупредительного уведомления
-read_notifications(access_token) # читаем все уведомления, что сбросить стаус "новые"
+access_token, refresh_token = page.autorize() # получили токены
 
-run_script_notifications(access_token) # выполнили скрипт с генерацией уведомления
-list_notifications_only_new = get_notifications_only_new(access_token) # запрос всех новых уведомлений
-have_notification_alarm = check_status_notification(list_notifications_only_new, "ALARM") # наличие уведомления об ошибки
-read_notifications(access_token) # читаем все уведомления, что сбросить стаус "новые"
+page.run_script_notifications(access_token) # выполнили скрипт с генерацией уведомления
+list_notifications_only_new = page.get_notifications_only_new(access_token) # запрос всех новых уведомлений
+have_notification_warning = page.check_status_notification(list_notifications_only_new, "WARNING") # наличие предупредительного уведомления
+page.read_notifications(access_token) # читаем все уведомления, что сбросить стаус "новые"
 
-run_script_notifications(access_token) # возвращаем скрипт в исходный статус
+page.run_script_notifications(access_token) # выполнили скрипт с генерацией уведомления
+list_notifications_only_new = page.get_notifications_only_new(access_token) # запрос всех новых уведомлений
+have_notification_alarm = page.check_status_notification(list_notifications_only_new, "ALARM") # наличие уведомления об ошибки
+page.read_notifications(access_token) # читаем все уведомления, что сбросить стаус "новые"
+
+page.run_script_notifications(access_token) # возвращаем скрипт в исходный статус
 
 
 if have_notification_warning == False:
