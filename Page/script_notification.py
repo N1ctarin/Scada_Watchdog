@@ -48,7 +48,7 @@ def check_status_notification(list_notifications_only_new, status):
         list_s for list_s in json_array
         if (list_s['data']['notifications']['severity'] == status)
     ]
-    if (filtered_list.count() > 0): return True
+    if (len(filtered_list) > 0): return True
     else: return False
 
 def read_notifications(access_token):
