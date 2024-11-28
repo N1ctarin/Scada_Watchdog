@@ -1,4 +1,4 @@
-from .Page.script_notification import ScadaWatchdogNotification
+from Page.script_notification import ScadaWatchdogNotification
 import requests
 
 page = ScadaWatchdogNotification()

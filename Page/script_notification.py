@@ -34,24 +34,25 @@ class ScadaWatchdogNotification:
         print(request_for_run_script.status_code)
 
     def get_notifications_only_new(self, access_token):
-        link = "https://iiot.ekfgroup.com/api/v1/notifications?projectId=282&state=NEW&page=1&size=30"
-        headers = {'Accept-Encoding': 'gzip, deflate, br', 'content-type': 'application/json', 'accept': '*/*',
-                   'Connection': 'keep-alive', 'Content-Length': '56', 'Accept-Language': 'ru',
+        link = "https://iiot.ekfgroup.com/p/282/notifications?state=NEW"
+        headers = {'Accept-Encoding': 'gzip, deflate, br', 'accept': '*/*',
+                   'Connection': 'keep-alive', 'Accept-Language': 'ru',
                    'x-device-id': '86ec768b-2144-4d5c-9db0-84259c0c6e00', 'x-platform': 'web',
                    'Authorization': access_token}
         request_for_get_notifications = requests.get(link, headers=headers)
+        print(request_for_get_notifications.status_code)
+        print(request_for_get_notifications.json())
 
-        list_notifications_only_new = request_for_get_notifications.json()
-        return list_notifications_only_new
+        return request_for_get_notifications.json()['data']['notifications']
 
     def check_status_notification(self, list_notifications_only_new, status):
-        json_array = json.loads(list_notifications_only_new)
+        list_opt = list_notifications_only_new
+        count = 0
+        for notification in list_opt:
+            if notification['status'] == status: count += 1
+        print(count)
 
-        filtered_list = [
-            list_s for list_s in json_array
-            if (list_s['data']['notifications']['severity'] == status)
-        ]
-        if len(filtered_list) > 0 : return True
+        if count > 0: return True
         else: return False
 
     def read_notifications(self, access_token):
@@ -60,5 +61,8 @@ class ScadaWatchdogNotification:
                    'Connection': 'keep-alive', 'Content-Length': '56', 'Accept-Language': 'ru',
                    'x-device-id': '86ec768b-2144-4d5c-9db0-84259c0c6e00', 'x-platform': 'web',
                    'Authorization': access_token}
-        request_for_read_notifications = requests.get(link, headers=headers)
+        body = '{projectId: "282", state: "READ"}'
+        request_for_read_notifications = requests.post(link, headers=headers, json=body)
+        print(request_for_read_notifications.status_code, end=" ")
+        print("notifications read")
 
