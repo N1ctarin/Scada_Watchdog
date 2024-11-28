@@ -57,10 +57,10 @@ class ScadaWatchdogNotification:
     def read_notifications(self, access_token):
         link = "https://iiot.ekfgroup.com/api/v1/notifications/set-read-state"
         headers = {'Accept-Encoding': 'gzip, deflate, br', 'content-type': 'application/json', 'accept': '*/*',
-                   'Connection': 'keep-alive', 'Content-Length': '56', 'Accept-Language': 'ru',
+                   'Connection': 'keep-alive', 'Content-Length': '34', 'Accept-Language': 'ru',
                    'x-device-id': '86ec768b-2144-4d5c-9db0-84259c0c6e00', 'x-platform': 'web',
                    'Authorization': access_token}
-        body = '{projectId: "282", state: "READ"}'
+        body = {"projectId": "282", "state": "READ"}
         request_for_read_notifications = requests.post(link, headers=headers, json=body)
         print(request_for_read_notifications.status_code, end=" ")
         print("notifications read")
