@@ -34,22 +34,21 @@ class ScadaWatchdogNotification:
         print(request_for_run_script.status_code)
 
     def get_notifications_only_new(self, access_token):
-        link = "https://iiot.ekfgroup.com/p/282/notifications?state=NEW"
+        link = "https://iiot.ekfgroup.com/api/v1/notifications?projectId=282&state=NEW&page=1&size=30"
         headers = {'Accept-Encoding': 'gzip, deflate, br', 'accept': '*/*',
                    'Connection': 'keep-alive', 'Accept-Language': 'ru',
                    'x-device-id': '86ec768b-2144-4d5c-9db0-84259c0c6e00', 'x-platform': 'web',
                    'Authorization': access_token}
         request_for_get_notifications = requests.get(link, headers=headers)
         print(request_for_get_notifications.status_code)
-        print(request_for_get_notifications.json())
-
+        print(request_for_get_notifications.json()['data']['notifications'])
         return request_for_get_notifications.json()['data']['notifications']
 
     def check_status_notification(self, list_notifications_only_new, status):
         list_opt = list_notifications_only_new
         count = 0
         for notification in list_opt:
-            if notification['status'] == status: count += 1
+            if notification['severity'] == status: count += 1
         print(count)
 
         if count > 0: return True
