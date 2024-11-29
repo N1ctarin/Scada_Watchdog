@@ -26,6 +26,6 @@ else:
 if have_notification_alarm == False:
     requests.get('https://api.telegram.org/bot7205176061:AAGjERufx2q-IAsbHCIAMKEBeHrVyo9lJMo/sendMessage?chat_id=-4503284662&text=Не работают уведомления с параметром "Alarm"(ТЕСТ)')
 else:
-    if Flag == False:
+    if Flag == True:
         requests.get('https://api.telegram.org/bot7205176061:AAGjERufx2q-IAsbHCIAMKEBeHrVyo9lJMo/sendMessage?chat_id=-4503284662&text=Автоматический прогон. Не обращайте внимание')
 
