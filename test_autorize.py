@@ -3,7 +3,7 @@ import requests
 
 page = ScadaWatchdogNotification()
 
-access_token, refresh_token = page.autorize() # получили токены
+access_token, refresh_token = page.authorization() # получили токены
 
 page.run_script_notifications(access_token) # выполнили скрипт с генерацией уведомления
 list_notifications_only_new = page.get_notifications_only_new(access_token) # запрос всех новых уведомлений
