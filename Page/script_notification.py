@@ -77,8 +77,6 @@ class ScadaWatchdogNotification:
         return response_group_tags_project.json()['data']['tags']
 
     def check_status_tags(self, tags_before_scripts, tags_after_scripts):
-        print(tags_before_scripts[1]['value'])
-        print(tags_after_scripts[1]['value'])
         if tags_before_scripts[1]['value'] != tags_after_scripts[1]['value']:
             return True
         else:
