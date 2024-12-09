@@ -14,17 +14,27 @@ class ScadaWatchdogNotification:
         body_for_request_auto = {"login":{"type":"EMAIL","value":email},"password":password}
         headers = {'Accept-Encoding': 'gzip, deflate, br', 'content-type': 'application/json', 'accept': '*/*', 'Connection': 'keep-alive', 'Content-Length': '85', 'Accept-Language': 'ru', 'x-device-id': '86ec768b-2144-4d5c-9db0-84259c0c6e00', 'x-platform': 'web'}
         request_for_login = requests.post(link, json=body_for_request_auto, headers=headers)
+        id_aut = request_for_login.json()['data']['otp']['id']
 
-        access_token_get = request_for_login.json()['data']['session']['accessToken']
-        refresh_token_get = request_for_login.json()['data']['session']['refreshToken']
-        return access_token_get, refresh_token_get
+        link = "https://iiot.ekfgroup.com/api/v1/otp/verify"
+        body = {"transactionId": id_aut, "otp": "0000"}
+        request_for_verify = requests.post(link, json=body, headers=headers)
+        token = request_for_verify.json()['data']['verification']['token']
 
-    def run_script_notifications(self, access_token):
-        link = "https://iiot.ekfgroup.com/api/v1/scripts/2533/run"
+        link = "https://iiot.ekfgroup.com/api/v1/auth/signin/verify"
+        body = {"verificationToken": token}
+        request_for_verify_2 = requests.post(link, json=body, headers=headers)
+
+        access_token_get = request_for_verify_2.json()['data']['session']['accessToken']
+        refresh_token_get = request_for_verify_2.json()['data']['session']['refreshToken']
+        return access_token_get, refresh_token_get, id_aut
+
+    def run_script(self, access_token, number, id_aut):
+        link = f"https://iiot.ekfgroup.com/api/v1/scripts/{number}/run"
         headers = {'Accept-Encoding': 'gzip, deflate, br', 'content-type': 'application/json', 'accept': '*/*',
                    'Connection': 'keep-alive', 'Content-Length': '56', 'Accept-Language': 'ru',
                    'x-device-id': '86ec768b-2144-4d5c-9db0-84259c0c6e00', 'x-platform': 'web', 'Authorization': access_token}
-        body_for_request = {'transactionId': "c8df1e87-c2a3-4767-b027-1f46b664ff63"}
+        body_for_request = {'transactionId': id_aut}
         request_for_run_script = requests.post(link, headers=headers, json=body_for_request)
 
     def get_notifications_only_new(self, access_token):
@@ -55,3 +65,19 @@ class ScadaWatchdogNotification:
         body = {"projectId": "282", "state": "READ"}
         request_for_read_notifications = requests.post(link, headers=headers, json=body)
 
+    def get_group_tags_project(self, access_token, project_id):
+        link = f"https://iiot.ekfgroup.com/api/v1/tags/by-node?componentNodeId={project_id}&verbose=true&page=1&size=30"
+        headers = {'Accept-Encoding': 'gzip, deflate, br', 'accept': '*/*',
+                   'Connection': 'keep-alive', 'Accept-Language': 'ru',
+                   'x-device-id': '86ec768b-2144-4d5c-9db0-84259c0c6e00', 'x-platform': 'web',
+                   'Authorization': access_token}
+        response_group_tags_project = requests.get(link, headers=headers)
+        return response_group_tags_project.json()['data']['tags']
+
+    def check_status_tags(self, tags_before_scripts, tags_after_scripts):
+        print(tags_before_scripts[1]['value'])
+        print(tags_after_scripts[1]['value'])
+        if tags_before_scripts[1]['value'] != tags_after_scripts[1]['value']:
+            return True
+        else:
+            return False
