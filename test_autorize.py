@@ -4,19 +4,19 @@ import requests
 
 def notification_warning_and_alarm():
     page = ScadaWatchdogNotification()
-    access_token, refresh_token, id_aut = page.authorization() # получили токены
+    access_token, refresh_token = page.authorization() # получили токены
 
-    page.run_script(access_token, 2533, id_aut) # выполнили скрипт с генерацией уведомления
+    page.run_script(access_token, 2533) # выполнили скрипт с генерацией уведомления
     list_notifications_only_new = page.get_notifications_only_new(access_token) # запрос всех новых уведомлений
     have_notification_warning = page.check_status_notification(list_notifications_only_new, "WARNING") # наличие предупредительного уведомления
     page.read_notifications(access_token) # читаем все уведомления, что сбросить стаус "новые"
 
-    page.run_script(access_token, 2533, id_aut) # выполнили скрипт с генерацией уведомления
+    page.run_script(access_token, 2533) # выполнили скрипт с генерацией уведомления
     list_notifications_only_new = page.get_notifications_only_new(access_token) # запрос всех новых уведомлений
     have_notification_alarm = page.check_status_notification(list_notifications_only_new, "ALARM") # наличие уведомления об ошибки
     page.read_notifications(access_token) # читаем все уведомления, что сбросить стаус "новые"
 
-    page.run_script(access_token, 2533, id_aut) # возвращаем скрипт в исходный статус
+    page.run_script(access_token, 2533) # возвращаем скрипт в исходный статус
 
     Flag = False
     if have_notification_warning == False:
@@ -33,10 +33,10 @@ def notification_warning_and_alarm():
 
 def notification_trigger_script():
     page = ScadaWatchdogNotification()
-    access_token, refresh_token, id_aut = page.authorization() # получили токены
+    access_token, refresh_token = page.authorization() # получили токены
     tags_before_scripts = page.get_group_tags_project(access_token, 1373)  # получили список тегов из папки "скрипты" перед скриптом
     time.sleep(2)
-    page.run_script(access_token, 2538, id_aut) # выполнили скрипт (первый)
+    page.run_script(access_token, 2538) # выполнили скрипт (первый)
     time.sleep(2)
     tags_after_scripts = page.get_group_tags_project(access_token, 1373) # получили список тегов из папки "скрипты" после скрипта
     result = page.check_status_tags(tags_before_scripts, tags_after_scripts) # Проверка значений тегов до выполнения скрипта и после

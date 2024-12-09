@@ -1,5 +1,6 @@
 import json
 import requests
+import uuid
 
 
 class ScadaWatchdogNotification:
@@ -27,14 +28,15 @@ class ScadaWatchdogNotification:
 
         access_token_get = request_for_verify_2.json()['data']['session']['accessToken']
         refresh_token_get = request_for_verify_2.json()['data']['session']['refreshToken']
-        return access_token_get, refresh_token_get, id_aut
+        return access_token_get, refresh_token_get
 
-    def run_script(self, access_token, number, id_aut):
+    def run_script(self, access_token, number):
+        random_uuid = uuid.uuid4()
         link = f"https://iiot.ekfgroup.com/api/v1/scripts/{number}/run"
         headers = {'Accept-Encoding': 'gzip, deflate, br', 'content-type': 'application/json', 'accept': '*/*',
                    'Connection': 'keep-alive', 'Content-Length': '56', 'Accept-Language': 'ru',
                    'x-device-id': '86ec768b-2144-4d5c-9db0-84259c0c6e00', 'x-platform': 'web', 'Authorization': access_token}
-        body_for_request = {'transactionId': id_aut}
+        body_for_request = {'transactionId': f"{random_uuid}"}
         request_for_run_script = requests.post(link, headers=headers, json=body_for_request)
 
     def get_notifications_only_new(self, access_token):
