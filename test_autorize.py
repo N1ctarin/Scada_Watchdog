@@ -37,20 +37,33 @@ def notification_trigger_script():
     page = ScadaWatchdogNotification()
     access_token, refresh_token = page.authorization() # получили токены
     tags_before_scripts = page.get_group_tags_project(access_token, 1373)  # получили список тегов из папки "скрипты" перед скриптом
-    time.sleep(2)
+    time.sleep(5)
     page.run_script(access_token, 2538) # выполнили скрипт (первый)
-    time.sleep(2)
+    time.sleep(5)
     tags_after_scripts = page.get_group_tags_project(access_token, 1373) # получили список тегов из папки "скрипты" после скрипта
     result = page.check_status_tags(tags_before_scripts, tags_after_scripts) # Проверка значений тегов до выполнения скрипта и после
 
     if result == False:
         requests.get(
-            'https://api.telegram.org/bot7205176061:AAGjERufx2q-IAsbHCIAMKEBeHrVyo9lJMo/sendMessage?chat_id=-4503284662&text=(TEST) Не работает триггер "По изменению тега" в сервисе "Скрипты". Посмотрите!!!')
+            'https://api.telegram.org/bot7205176061:AAGjERufx2q-IAsbHCIAMKEBeHrVyo9lJMo/sendMessage?chat_id=-4503284662&text= Не работает триггер "По изменению тега" в сервисе "Скрипты". Посмотрите!!!')
     #else:
         #requests.get(
             #'https://api.telegram.org/bot7205176061:AAGjERufx2q-IAsbHCIAMKEBeHrVyo9lJMo/sendMessage?chat_id=-4503284662&text=Автоматический прогон. Не обращайте внимание')
 
 
-
+def check_telegram():
+    page = ScadaWatchdogNotification()
+    result = page.get_message()
+    print(result)
+    if result == False:
+        requests.get(
+            'https://api.telegram.org/bot7205176061:AAGjERufx2q-IAsbHCIAMKEBeHrVyo9lJMo/sendMessage?chat_id=-4503284662&text=Не работает сервис отправки уведомлений в Telegram. Посмотрите!!!')
+    elif result == 500:
+        requests.get(
+            'https://api.telegram.org/bot7205176061:AAGjERufx2q-IAsbHCIAMKEBeHrVyo9lJMo/sendMessage?chat_id=-4503284662&text=Внимание.\nОшибка выполнения скрипта проверки уведомлений в Телеграм.')
+    else:
+        requests.get(
+            'https://api.telegram.org/bot7205176061:AAGjERufx2q-IAsbHCIAMKEBeHrVyo9lJMo/sendMessage?chat_id=-4503284662&text=Автоматический прогон. Не обращайте внимание')
 notification_warning_and_alarm()
 notification_trigger_script()
+check_telegram()

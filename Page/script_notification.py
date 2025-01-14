@@ -1,4 +1,5 @@
 import json
+from datetime import datetime, timedelta
 import requests
 import uuid
 
@@ -81,3 +82,27 @@ class ScadaWatchdogNotification:
             return True
         else:
             return False
+
+    def get_message(self):
+        link = "https://api.telegram.org/bot7205176061:AAGjERufx2q-IAsbHCIAMKEBeHrVyo9lJMo/getUpdates?chat_id=-1002336236273&offset=-1"
+        response = requests.get(link)
+        try:
+            id_bot_from_telegram = response.json()['result'][0]['message']['forward_from']['id']
+            date_text = ((response.json()['result'][0]['message']['text'].split('\n')[6]).replace('T', ' '))[:26]
+            time_now = datetime.utcnow()
+            time_respons = datetime.strptime(date_text, '%Y-%m-%d %H:%M:%S.%f')
+            print(response.json())
+            print(id_bot_from_telegram)
+            print(date_text)
+            print(time_now)
+            time_difference = max(time_respons, time_now) - min(time_respons, time_now)
+            print(time_difference)
+            if time_difference > timedelta(minutes=5):
+                return False
+            else:
+                return True
+        except:
+            return 500
+
+
+
