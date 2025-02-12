@@ -5,12 +5,29 @@ import requests
 def notification_warning_and_alarm():
     page = ScadaWatchdogNotification()
     access_token, refresh_token = page.authorization() # получили токены
+    for i in range(6):
+        status_script = page.check_status_script_pre_run_script(access_token, "0.0")
+        if status_script:
+            page.read_notifications(access_token)
+            break
+        else:
+            page.run_script(access_token, 2533)
+            time.sleep(2)
 
     page.run_script(access_token, 2533) # выполнили скрипт с генерацией уведомления
     time.sleep(3)
     list_notifications_only_new = page.get_notifications_only_new(access_token) # запрос всех новых уведомлений
     have_notification_warning = page.check_status_notification(list_notifications_only_new, "WARNING") # наличие предупредительного уведомления
     page.read_notifications(access_token) # читаем все уведомления, что сбросить стаус "новые"
+
+    for i in range(6):
+        status_script = page.check_status_script_pre_run_script(access_token, "17.0")
+        if status_script:
+            page.read_notifications(access_token)
+            break
+        else:
+            page.run_script(access_token, 2533)
+            time.sleep(2)
 
     page.run_script(access_token, 2533) # выполнили скрипт с генерацией уведомления
     time.sleep(3)
@@ -22,12 +39,12 @@ def notification_warning_and_alarm():
 
     #Flag = False
     if have_notification_warning == False:
-        requests.get('https://api.telegram.org/bot7205176061:AAGjERufx2q-IAsbHCIAMKEBeHrVyo9lJMo/sendMessage?chat_id=-4503284662&text=(TEST)Не работают уведомления с параметром "Warning"')
+        requests.get('https://api.telegram.org/bot7205176061:AAGjERufx2q-IAsbHCIAMKEBeHrVyo9lJMo/sendMessage?chat_id=-4503284662&text=Не работают уведомления с параметром "Warning"')
     #else:
         #Flag = True
 
     if have_notification_alarm == False:
-        requests.get('https://api.telegram.org/bot7205176061:AAGjERufx2q-IAsbHCIAMKEBeHrVyo9lJMo/sendMessage?chat_id=-4503284662&text=(TEST)Не работают уведомления с параметром "Alarm"')
+        requests.get('https://api.telegram.org/bot7205176061:AAGjERufx2q-IAsbHCIAMKEBeHrVyo9lJMo/sendMessage?chat_id=-4503284662&text=Не работают уведомления с параметром "Alarm"')
     #else:
         #if Flag == True:
             #requests.get('https://api.telegram.org/bot7205176061:AAGjERufx2q-IAsbHCIAMKEBeHrVyo9lJMo/sendMessage?chat_id=-4503284662&text=Автоматический прогон. Не обращайте внимание')
@@ -64,6 +81,22 @@ def check_telegram():
     else:
         requests.get(
             'https://api.telegram.org/bot7205176061:AAGjERufx2q-IAsbHCIAMKEBeHrVyo9lJMo/sendMessage?chat_id=-4503284662&text=Автоматический прогон. Не обращайте внимание')
-notification_warning_and_alarm()
-notification_trigger_script()
-check_telegram()
+
+def test():
+    page = ScadaWatchdogNotification()
+    access_token, refresh_token = page.authorization()
+    for i in range(6):
+        status_script = page.check_status_script_pre_run_script(access_token, "0.0")
+        print(status_script)
+        if status_script:
+            page.read_notifications(access_token)
+            break
+        else:
+            page.run_script(access_token, 2533)
+            time.sleep(2)
+
+#notification_warning_and_alarm()
+#notification_trigger_script()
+#check_telegram()
+test()
+
