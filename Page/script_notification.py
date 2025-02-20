@@ -91,12 +91,7 @@ class ScadaWatchdogNotification:
             date_text = ((response.json()['result'][0]['message']['text'].split('\n')[6]).replace('T', ' '))[:26]
             time_now = datetime.utcnow()
             time_respons = datetime.strptime(date_text, '%Y-%m-%d %H:%M:%S.%f')
-            print(response.json())
-            print(id_bot_from_telegram)
-            print(date_text)
-            print(time_now)
             time_difference = max(time_respons, time_now) - min(time_respons, time_now)
-            print(time_difference)
             if time_difference > timedelta(minutes=5):
                 return False
             else:
@@ -112,9 +107,24 @@ class ScadaWatchdogNotification:
                    'Authorization': access_token}
         response_check_status_script_pre_run_script = requests.get(link, headers=headers)
         value_widget = response_check_status_script_pre_run_script.json()['data']['widgets'][4]['data'][0]['value']
-        print(value_widget)
         if value_widget == desired_value: return True
         else: return False
 
+    def check_value_tag(self, access_token, number_project, number_tag):
+        link = f"https://iiot.ekfgroup.com/api/v1/tags/by-node?componentNodeId={number_project}&verbose=true&page=1&size=30"
+        headers = {'Accept-Encoding': 'gzip, deflate, br', 'accept': '*/*',
+                   'Connection': 'keep-alive', 'Accept-Language': 'ru',
+                   'x-device-id': '86ec768b-2144-4d5c-9db0-84259c0c6e00', 'x-platform': 'web',
+                   'Authorization': access_token}
+        response_check_status_value_tag = requests.get(link, headers=headers)
+        return response_check_status_value_tag.json()['data']['tags'][number_tag]['value']
 
 
+    def edit_value_tag(self, access_token, id_tag, value):
+        link = f"https://iiot.ekfgroup.com/api/v1/tags/{id_tag}/value/edit"
+        headers = {'Accept-Encoding': 'gzip, deflate, br', 'content-type': 'application/json', 'accept': '*/*',
+                   'Connection': 'keep-alive', 'Content-Length': '34', 'Accept-Language': 'ru',
+                   'x-device-id': '86ec768b-2144-4d5c-9db0-84259c0c6e00', 'x-platform': 'web',
+                   'Authorization': access_token}
+        body = {"value":f"{value}"}
+        s = requests.post(link, headers=headers, json=body)
