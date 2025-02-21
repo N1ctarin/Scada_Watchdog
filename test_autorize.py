@@ -102,5 +102,5 @@ def proverka():
 #notification_warning_and_alarm()
 #check_trigger_script()
 #check_telegram()
-#test()
+proverka()
 

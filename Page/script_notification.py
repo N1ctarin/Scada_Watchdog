@@ -2,6 +2,7 @@ import json
 from datetime import datetime, timedelta
 import requests
 import uuid
+from Page.logs.page_logger import logger
 
 
 class ScadaWatchdogNotification:
@@ -32,14 +33,23 @@ class ScadaWatchdogNotification:
         return access_token_get, refresh_token_get
 
     def run_script(self, access_token, number):
-        random_uuid = uuid.uuid4()
         link = f"https://iiot.ekfgroup.com/api/v1/scripts/{number}/run"
         headers = {'Accept-Encoding': 'gzip, deflate, br', 'content-type': 'application/json', 'accept': '*/*',
-                   'Connection': 'keep-alive', 'Content-Length': '56', 'Accept-Language': 'ru',
-                   'x-device-id': '86ec768b-2144-4d5c-9db0-84259c0c6e00', 'x-platform': 'web', 'Authorization': access_token}
-        body_for_request = {'transactionId': f"{random_uuid}"}
-        request_for_run_script = requests.post(link, headers=headers, json=body_for_request)
-
+                       'Connection': 'keep-alive', 'Content-Length': '56', 'Accept-Language': 'ru',
+                       'x-device-id': '86ec768b-2144-4d5c-9db0-84259c0c6e00', 'x-platform': 'web', 'Authorization': access_token}
+        transaction_id = uuid.uuid4()
+        body_for_request = {'transactionId': f"{transaction_id}"}
+        status_code = 0
+        try:
+            request_for_run_script = requests.post(link, headers=headers, json=body_for_request)
+            status_code = request_for_run_script.status_code
+        except Exception as e:
+            logger.warning(f"Status_code - {status_code}, id_scripts - {transaction_id}, Error - {e}", exc_info=True)
+        finally:
+            if status_code != 204:
+                logger.warning(f"Status_code - {status_code}, id_scripts - {transaction_id}, Error - Status_code", exc_info=True)
+            else:
+                logger.info(f"Status_code - {status_code}, id_scripts - {transaction_id}")
     def get_notifications_only_new(self, access_token):
         link = "https://iiot.ekfgroup.com/api/v1/notifications?projectId=282&state=NEW&page=1&size=30"
         headers = {'Accept-Encoding': 'gzip, deflate, br', 'accept': '*/*',
