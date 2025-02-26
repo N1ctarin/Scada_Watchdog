@@ -1,4 +1,5 @@
 import time
+from Page.logs.page_logger import logger_default
 from Page.script_notification import ScadaWatchdogNotification
 import requests
 
@@ -99,8 +100,11 @@ def proverka():
             page.run_script(access_token, 2533)
             time.sleep(2)
 
+logger_default.info("START")
 #notification_warning_and_alarm()
 #check_trigger_script()
 #check_telegram()
-proverka()
+#logger_default.info(f"Status_code - finish")
 
+proverka()
+logger_default.info("FINISH")
