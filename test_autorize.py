@@ -6,16 +6,17 @@ import requests
 def notification_warning_and_alarm():
     page = ScadaWatchdogNotification()
     access_token, refresh_token = page.authorization() # получили токены
+
     for i in range(6):
         status_script = page.check_status_script_pre_run_script(access_token, "0.0")
         if status_script:
             page.read_notifications(access_token)
             break
         else:
-            page.run_script(access_token, 2533)
+            page.edit_value_tag(access_token, 6593, "0.0")
             time.sleep(2)
 
-    page.run_script(access_token, 2533) # выполнили скрипт с генерацией уведомления
+    page.edit_value_tag(access_token, 6593, "17.0")
     time.sleep(3)
     list_notifications_only_new = page.get_notifications_only_new(access_token) # запрос всех новых уведомлений
     have_notification_warning = page.check_status_notification(list_notifications_only_new, "WARNING") # наличие предупредительного уведомления
@@ -27,24 +28,23 @@ def notification_warning_and_alarm():
             page.read_notifications(access_token)
             break
         else:
-            page.run_script(access_token, 2533)
+            page.edit_value_tag(access_token, 6593, "17.0")
             time.sleep(2)
 
-    page.run_script(access_token, 2533) # выполнили скрипт с генерацией уведомления
+    page.edit_value_tag(access_token, 6593, "25.0")
     time.sleep(3)
     list_notifications_only_new = page.get_notifications_only_new(access_token) # запрос всех новых уведомлений
     have_notification_alarm = page.check_status_notification(list_notifications_only_new, "ALARM") # наличие уведомления об ошибки
     page.read_notifications(access_token) # читаем все уведомления, что сбросить стаус "новые"
-
-    page.run_script(access_token, 2533) # возвращаем скрипт в исходный статус
+    page.edit_value_tag(access_token, 6593, "0.0")
 
     #Flag = False
-    if have_notification_warning == False:
+    if not have_notification_warning:
         requests.get('https://api.telegram.org/bot7205176061:AAGjERufx2q-IAsbHCIAMKEBeHrVyo9lJMo/sendMessage?chat_id=-4503284662&text=Не работают уведомления с параметром "Warning"')
     #else:
         #Flag = True
 
-    if have_notification_alarm == False:
+    if not have_notification_alarm:
         requests.get('https://api.telegram.org/bot7205176061:AAGjERufx2q-IAsbHCIAMKEBeHrVyo9lJMo/sendMessage?chat_id=-4503284662&text=Не работают уведомления с параметром "Alarm"')
     #else:
         #if Flag == True:
@@ -66,7 +66,7 @@ def check_trigger_script():
     tags_after_scripts = page.get_group_tags_project(access_token, 1373) # получили список тегов из папки "скрипты" после скрипта
     result = page.check_status_tags(tags_before_scripts, tags_after_scripts) # Проверка значений тегов до выполнения скрипта и после
 
-    if result == False:
+    if not result:
         requests.get(
             'https://api.telegram.org/bot7205176061:AAGjERufx2q-IAsbHCIAMKEBeHrVyo9lJMo/sendMessage?chat_id=-4503284662&text= Не работает триггер "По изменению тега" в сервисе "Скрипты". Посмотрите!!!')
     #else:
@@ -77,15 +77,15 @@ def check_trigger_script():
 def check_telegram():
     page = ScadaWatchdogNotification()
     result = page.get_message()
-    if result == False:
+    if not result:
         requests.get(
             'https://api.telegram.org/bot7205176061:AAGjERufx2q-IAsbHCIAMKEBeHrVyo9lJMo/sendMessage?chat_id=-4503284662&text=Не работает сервис отправки уведомлений в Telegram. Посмотрите!!!')
     elif result == 500:
         requests.get(
             'https://api.telegram.org/bot7205176061:AAGjERufx2q-IAsbHCIAMKEBeHrVyo9lJMo/sendMessage?chat_id=-4503284662&text=Внимание.\nОшибка выполнения скрипта проверки уведомлений в Телеграм.')
-    else:
-        requests.get(
-            'https://api.telegram.org/bot7205176061:AAGjERufx2q-IAsbHCIAMKEBeHrVyo9lJMo/sendMessage?chat_id=-4503284662&text=Автоматический прогон. Не обращайте внимание')
+    #else:
+    #    requests.get(
+    #        'https://api.telegram.org/bot7205176061:AAGjERufx2q-IAsbHCIAMKEBeHrVyo9lJMo/sendMessage?chat_id=-4503284662&text=Автоматический прогон. Не обращайте внимание')
 
 def proverka():
     page = ScadaWatchdogNotification()
@@ -101,10 +101,10 @@ def proverka():
             time.sleep(2)
 
 logger_default.info("START")
-#notification_warning_and_alarm()
-#check_trigger_script()
-#check_telegram()
-#logger_default.info(f"Status_code - finish")
+notification_warning_and_alarm()
+check_trigger_script()
+check_telegram()
+logger_default.info(f"Status_code - finish")
 
-proverka()
-logger_default.info("FINISH")
+#proverka()
+#logger_default.info("FINISH")
