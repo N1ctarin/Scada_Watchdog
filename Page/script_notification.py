@@ -129,14 +129,14 @@ class ScadaWatchdogNotification:
             return 500
 
     def check_status_script_pre_run_script(self, access_token, desired_value):
-        link = "https://iiot.ekfgroup.com/api/v1/dashboards/5005/widgets"
+        link = "https://iiot.ekfgroup.com/api/v1/tags/by-node?componentNodeId=1367&verbose=true&page=1&size=30"
         headers = {'Accept-Encoding': 'gzip, deflate, br', 'accept': '*/*',
                    'Connection': 'keep-alive', 'Accept-Language': 'ru',
                    'x-device-id': '86ec768b-2144-4d5c-9db0-84259c0c6e00', 'x-platform': 'web',
                    'Authorization': access_token}
         try:
             response_check_status_script_pre_run_script = requests.get(link, headers=headers)
-            value_widget = response_check_status_script_pre_run_script.json()['data']['widgets'][4]['data'][0]['value']
+            value_widget = response_check_status_script_pre_run_script.json()['data']['tags'][0]['value']
             return True if value_widget == desired_value else False
         except Exception as e:
             logger.error(f" Error - check_script_pre_run_script, Error - {e}", exc_info=True)
