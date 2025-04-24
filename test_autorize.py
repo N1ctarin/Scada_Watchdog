@@ -7,36 +7,43 @@ def notification_warning_and_alarm():
     page = ScadaWatchdogNotification()
     access_token, refresh_token = page.authorization() # получили токены
 
+    counter_fault_write_valume_in_tag = 0
     for i in range(6): # Проверка исходных значений в теге (парсит значение на дашборде) - лучше отрефакторить
-        status_script = page.check_status_script_pre_run_script(access_token, "0.0")
+        status_script = page.check_comparison_value_tags_for_notifications(access_token, 0)
         if status_script:
             page.read_notifications(access_token)
             break
         else:
-            page.edit_value_tag(access_token, 6593, "0.0")
+            page.edit_value_tag(access_token, 6593, 0)
             time.sleep(2)
+            counter_fault_write_valume_in_tag += 1
 
-    page.edit_value_tag(access_token, 6593, "17.0")
+    page.edit_value_tag(access_token, 6593, 17)
     time.sleep(3) # техническое ожидание, чтоб данные успели обновиться в тегах
     list_notifications_only_new = page.get_notifications_only_new(access_token) # запрос всех новых уведомлений
     have_notification_warning = page.check_status_notification(list_notifications_only_new, "WARNING") # наличие предупредительного уведомления
     page.read_notifications(access_token) # читаем все уведомления, что сбросить стаус "новые"
 
     for i in range(6): # Проверка исходных значений в теге (парсит значение на дашборде) - лучше отрефакторить
-        status_script = page.check_status_script_pre_run_script(access_token, "17.0")
+        status_script = page.check_comparison_value_tags_for_notifications(access_token, 17)
         if status_script:
             page.read_notifications(access_token)
             break
         else:
-            page.edit_value_tag(access_token, 6593, "17.0")
+            page.edit_value_tag(access_token, 6593, 17)
             time.sleep(2)
+            counter_fault_write_valume_in_tag += 1
 
-    page.edit_value_tag(access_token, 6593, "25.0")
+    if counter_fault_write_valume_in_tag >= 5:
+        requests.get(
+            'https://api.telegram.org/bot7205176061:AAGjERufx2q-IAsbHCIAMKEBeHrVyo9lJMo/sendMessage?chat_id=-4503284662&text=Внимание.\nОшибка записи значения в тег')
+
+    page.edit_value_tag(access_token, 6593, 25)
     time.sleep(3) # техническое ожидание, чтоб данные успели обновиться в тегах
     list_notifications_only_new = page.get_notifications_only_new(access_token) # запрос всех новых уведомлений
     have_notification_alarm = page.check_status_notification(list_notifications_only_new, "ALARM") # наличие уведомления об ошибки
     page.read_notifications(access_token) # читаем все уведомления, что сбросить стаус "новые"
-    page.edit_value_tag(access_token, 6593, "0.0")
+    page.edit_value_tag(access_token, 6593, 0)
 
     #Flag = False
     if not have_notification_warning:

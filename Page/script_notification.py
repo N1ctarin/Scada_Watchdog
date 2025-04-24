@@ -128,7 +128,7 @@ class ScadaWatchdogNotification:
         except:
             return 500
 
-    def check_status_script_pre_run_script(self, access_token, desired_value):
+    def check_comparison_value_tags_for_notifications(self, access_token, desired_value):
         link = "https://iiot.ekfgroup.com/api/v1/tags/by-node?componentNodeId=1367&verbose=true&page=1&size=30"
         headers = {'Accept-Encoding': 'gzip, deflate, br', 'accept': '*/*',
                    'Connection': 'keep-alive', 'Accept-Language': 'ru',
@@ -136,7 +136,7 @@ class ScadaWatchdogNotification:
                    'Authorization': access_token}
         try:
             response_check_status_script_pre_run_script = requests.get(link, headers=headers)
-            value_widget = response_check_status_script_pre_run_script.json()['data']['tags'][0]['value']
+            value_widget = int(response_check_status_script_pre_run_script.json()['data']['tags'][0]['value'])
             return True if value_widget == desired_value else False
         except Exception as e:
             logger.error(f" Error - check_script_pre_run_script, Error - {e}", exc_info=True)
@@ -164,5 +164,7 @@ class ScadaWatchdogNotification:
         body = {"value":f"{value}"}
         try:
             s = requests.post(link, headers=headers, json=body)
+            if s.status_code != 200:
+                logger.error(f" Error - edit_value_tag, Error - {s.status_code}", exc_info=True)
         except Exception as e:
             logger.error(f" Error - edit_value_tag, Error - {e}", exc_info=True)
